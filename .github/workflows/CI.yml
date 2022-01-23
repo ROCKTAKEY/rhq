@@ -27,6 +27,13 @@ jobs:
           - 'snapshot'
     steps:
       - uses: actions/checkout@v1
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: rhq
       - uses: purcell/setup-emacs@master
         with:
           version: ${{ matrix.emacs_version }}
