@@ -1,0 +1,6 @@
+(source gnu melpa)
+
+(package (rhq
+          (recipe . (:fetcher github :repo "ROCKTAKEY/rhq"))))
+
+(dev-dependency undercover)
