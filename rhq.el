@@ -27,26 +27,22 @@
 
 ;;; Code:
 
+(require 'shell)
+
 (defgroup rhq nil
   "Client for rhq command."
   :prefix "rhq-"
   :group 'tools)
 
-(eval-and-compile
-  (if (functionp #'split-string-shell-command)
-      (defalias 'rhq--split-string-shell-command #'split-string-shell-command)
-    (defvar comint-file-name-quote-list)
-    (defvar shell-file-name-quote-list)
-    (declare-function shell--parse-pcomplete-arguments "shell")
-    ;; Copied from shell.el in emacs-28.0.91
-    (defun rhq--split-string-shell-command (string)
-      "Split STRING (a shell command) into a list of strings.
+;; Copied from shell.el in emacs-28.0.91
+(defun rhq--split-string-shell-command (string)
+  "Split STRING (a shell command) into a list of strings.
 General shell syntax, like single and double quoting, as well as
 backslash quoting, is respected."
-      (with-temp-buffer
-        (insert string)
-        (let ((comint-file-name-quote-list shell-file-name-quote-list))
-          (car (shell--parse-pcomplete-arguments)))))))
+  (with-temp-buffer
+    (insert string)
+    (let ((comint-file-name-quote-list shell-file-name-quote-list))
+      (car (shell--parse-pcomplete-arguments)))))
 
 (defcustom rhq-executable "rhq"
   "Location of rhq executable."
