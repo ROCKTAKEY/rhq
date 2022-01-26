@@ -5,7 +5,7 @@
 ;; Author: ROCKTAKEY <rocktakey@gmail.com>
 ;; Keywords: tools, extensions
 
-;; Version: 0.1.2
+;; Version: 0.1.3
 ;; Package-Requires: ((emacs "24.3"))
 ;; URL: https://github.com/ROCKTAKEY/rhq
 ;; This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,7 @@ backslash quoting, is respected."
   :group 'rhq
   :type 'string)
 
-(defvar rhq--subcommands
+(defconst rhq--subcommands
   '("add"
     "clone"
     "completion"
