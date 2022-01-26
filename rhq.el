@@ -90,12 +90,13 @@ backslash quoting, is respected."
      rhq--subcommands)
     (rhq--split-string-shell-command
      (read-from-minibuffer "Arguments: "))))
-  (async-shell-command
+  (let ((async-shell-command-display-buffer nil))
+   (async-shell-command
    (apply #'rhq--make-shell-command-string
           rhq-executable
           subcommand
           args)
-   rhq-async-buffer))
+   rhq-async-buffer)))
 
 ;;;###autoload
 (defun rhq-call-command-to-string (subcommand &rest args)
