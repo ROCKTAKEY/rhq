@@ -5,8 +5,8 @@
 ;; Author: ROCKTAKEY <rocktakey@gmail.com>
 ;; Keywords: tools, extensions
 
-;; Version: 0.1.0
-;; Package-Requires: ((emacs "24.1"))
+;; Version: 0.1.1
+;; Package-Requires: ((emacs "24.3"))
 ;; URL: https://github.com/ROCKTAKEY/rhq
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -27,10 +27,22 @@
 
 ;;; Code:
 
+(require 'shell)
+
 (defgroup rhq nil
   "Client for rhq command."
   :prefix "rhq-"
   :group 'tools)
+
+;; Copied from shell.el in emacs-28.0.91
+(defun rhq--split-string-shell-command (string)
+  "Split STRING (a shell command) into a list of strings.
+General shell syntax, like single and double quoting, as well as
+backslash quoting, is respected."
+  (with-temp-buffer
+    (insert string)
+    (let ((comint-file-name-quote-list shell-file-name-quote-list))
+      (car (shell--parse-pcomplete-arguments)))))
 
 (defcustom rhq-executable "rhq"
   "Location of rhq executable."
@@ -76,7 +88,7 @@
     (completing-read
      "Subcommand: "
      rhq--subcommands)
-    (split-string-shell-command
+    (rhq--split-string-shell-command
      (read-from-minibuffer "Arguments: "))))
   (async-shell-command
    (apply #'rhq--make-shell-command-string
