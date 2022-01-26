@@ -133,6 +133,7 @@ backslash quoting, is respected."
   (interactive "sProject URL: ")
   (rhq-call-command "clone" url))
 
+;;;###autoload
 (defun rhq-import (dirname)
   "Import DIRNAME as rhq-managed project."
   (interactive "DImport project: ")
