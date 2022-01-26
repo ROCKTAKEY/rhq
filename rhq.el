@@ -136,8 +136,9 @@ backslash quoting, is respected."
 
 ;;;###autoload
 (defun rhq-import (dirname)
-  "Import DIRNAME as rhq-managed project."
-  (interactive "DImport project: ")
+  "Import DIRNAME as root of rhq-managed projects.
+Directories in DIRNAME are regarded as one of project."
+  (interactive "DImport root of projects: ")
   (rhq-call-command "import" dirname))
 
 (provide 'rhq)
