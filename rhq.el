@@ -56,7 +56,7 @@ backslash quoting, is respected."
   :group 'rhq
   :type 'string)
 
-(defvar rhq--subcommands
+(defconst rhq--subcommands
   '("add"
     "clone"
     "completion"
