@@ -172,7 +172,13 @@ Directories in DIRNAME are regarded as one of project."
 
 ;;;###autoload
 (defun rhq-clone (url &optional root vcs)
-  "Clone repository from URL by rhq."
+  "Clone repository from URL by rhq.
+
+If ROOT is non-nil, it should be path to destination of new repository.
+If VCS is non-nil, it should be version control system name:
+  git(default), hg, darcs, pijul
+
+With prefix argument, you can explicitly pass ROOT and VCS from minibuffer."
   (interactive
    `(,(read-string "Project URL (\"username/repo\" is also allowed): ")
      ,@(when prefix-arg
