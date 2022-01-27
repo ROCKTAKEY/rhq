@@ -80,6 +80,11 @@ backslash quoting, is respected."
    "Project: "
    (rhq-get-project-list)))
 
+(defun rhq--check-executable-availability ()
+  "Confirm `rhq-executable' exist as executable."
+  (unless (executable-find rhq-executable)
+    (error "\"rhq\" is not available. Please run `rhq-install-executable' and install it")))
+
 ;;;###autoload
 (defun rhq-install-executable (&optional noconfirm)
   "Install rhq.
