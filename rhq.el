@@ -151,6 +151,12 @@ If NOCONFIRM is non-nil, you are not asked confirmation."
   (rhq-call-command "clone" url))
 
 ;;;###autoload
+(defun rhq-refresh ()
+  "Rhq executable refreshes project list."
+  (interactive)
+  (rhq-call-command "refresh"))
+
+;;;###autoload
 (defun rhq-import (dirname)
   "Import DIRNAME as root of rhq-managed projects.
 Directories in DIRNAME are regarded as one of project."
