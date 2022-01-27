@@ -34,6 +34,7 @@
             (:report-file "coverage-final.json")
             (:send-report nil))
 
+(require 'rhq)
 
 
 (provide 'rhq-test)
