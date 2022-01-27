@@ -169,7 +169,7 @@ Directories in DIRNAME are regarded as one of project."
   (interactive "DImport project: ")
   (rhq-call-command "add" dirname))
 
-(defconst rhq--new-vcs-list
+(defconst rhq--vcs-list
   '("git"
     "hg"
     "darcs"
@@ -191,7 +191,7 @@ With prefix argument, you can explicitly pass ROOT and VCS from minibuffer."
          (list
           (read-directory-name "Root directory name (where the repository is placed): " default-directory)
           (completing-read "Version control system: "
-                           rhq--new-vcs-list)))))
+                           rhq--vcs-list)))))
   (apply
    #'rhq-call-command
    "new"
