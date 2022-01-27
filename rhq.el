@@ -81,6 +81,15 @@ backslash quoting, is respected."
    (rhq-get-project-list)))
 
 ;;;###autoload
+(defun rhq-install-executable (&optional noconfirm)
+  "Install rhq.
+If NOCONFIRM is non-nil, you are not asked confirmation."
+  (interactive "P")
+  (when (or noconfirm
+            (y-or-n-p "\"Cargo\" is prerequisited. Install rhq?"))
+    (async-shell-command "cargo install rhq")))
+
+;;;###autoload
 (defun rhq-call-command (subcommand &rest args)
   "Call `rhq-executable' with SUBCOMMAND and ARGS, asynchronously."
   (interactive
