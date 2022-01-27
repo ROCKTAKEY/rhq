@@ -104,6 +104,7 @@ If NOCONFIRM is non-nil, you are not asked confirmation."
      rhq--subcommands)
     (rhq--split-string-shell-command
      (read-from-minibuffer "Arguments: "))))
+  (rhq--check-executable-availability)
   (let ((async-shell-command-display-buffer nil))
    (async-shell-command
    (apply #'rhq--make-shell-command-string
@@ -115,6 +116,7 @@ If NOCONFIRM is non-nil, you are not asked confirmation."
 ;;;###autoload
 (defun rhq-call-command-to-string (subcommand &rest args)
   "Call `rhq-executable' with SUBCOMMAND and ARGS, and get output as string."
+  (rhq--check-executable-availability)
   (shell-command-to-string
    (apply #'rhq--make-shell-command-string
           rhq-executable
