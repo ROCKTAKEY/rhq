@@ -176,5 +176,28 @@ Directories in DIRNAME are regarded as one of project."
     "pijul")
   "Possible values as --vcs argument on \"rhq new\".")
 
+;;;###autoload
+(defun rhq-new (name &optional root vcs)
+  "Create new repository named NAME.
+NAME can be \"github.com/username/repo\", \"username/repo\" and so on.
+If ROOT is non-nil, it should be path to destination of new repository.
+If VCS is non-nil, it should be version control system name:
+  git(default), hg, darcs, pijul
+
+With prefix argument, you can explicitly pass ROOT and VCS from minibuffer."
+  (interactive
+   `(,(read-string "New repository name (like \"username/repo\"): ")
+     ,@(when prefix-arg
+         (list
+          (read-directory-name "Root directory name (where the repository is placed): " default-directory)
+          (completing-read "Version control system: "
+                           rhq--new-vcs-list)))))
+  (apply
+   #'rhq-call-command
+   "new"
+   name
+   `(,@(when root (list "--root" root))
+     ,@(when vcs (list "--vcs" vcs)))))
+
 (provide 'rhq)
 ;;; rhq.el ends here
