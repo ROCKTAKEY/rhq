@@ -163,5 +163,18 @@ Directories in DIRNAME are regarded as one of project."
   (interactive "DImport root of projects: ")
   (rhq-call-command "import" dirname))
 
+;;;###autoload
+(defun rhq-add (dirname)
+  "Add DIRNAME as rhq-managed project."
+  (interactive "DImport project: ")
+  (rhq-call-command "add" dirname))
+
+(defconst rhq--new-vcs-list
+  '("git"
+    "hg"
+    "darcs"
+    "pijul")
+  "Possible values as --vcs argument on \"rhq new\".")
+
 (provide 'rhq)
 ;;; rhq.el ends here
