@@ -5,7 +5,7 @@
 ;; Author: ROCKTAKEY <rocktakey@gmail.com>
 ;; Keywords: tools, extensions
 
-;; Version: 0.1.4
+;; Version: 0.1.5
 ;; Package-Requires: ((emacs "24.3"))
 ;; URL: https://github.com/ROCKTAKEY/rhq
 ;; This program is free software; you can redistribute it and/or modify
@@ -136,8 +136,9 @@ backslash quoting, is respected."
 
 ;;;###autoload
 (defun rhq-import (dirname)
-  "Import DIRNAME as rhq-managed project."
-  (interactive "DImport project: ")
+  "Import DIRNAME as root of rhq-managed projects.
+Directories in DIRNAME are regarded as one of project."
+  (interactive "DImport root of projects: ")
   (rhq-call-command "import" dirname))
 
 (provide 'rhq)
