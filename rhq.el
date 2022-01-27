@@ -151,11 +151,18 @@ If NOCONFIRM is non-nil, you are not asked confirmation."
   (rhq-call-command "refresh"))
 
 ;;;###autoload
-(defun rhq-import (dirname)
+(defun rhq-import (dirname &optional depth)
   "Import DIRNAME as root of rhq-managed projects.
-Directories in DIRNAME are regarded as one of project."
-  (interactive "DImport root of projects: ")
-  (rhq-call-command "import" dirname))
+Directories in DIRNAME are regarded as one of project.
+
+DEPTH means maximal depth of entries for each base directory, which is passed
+as \"--depth\" argument."
+  (interactive
+   `(,(read-directory-name "Import root of projects: ")
+     ,(when prefix-arg
+        (read-number "Maximal depth of entries: "))))
+  (apply #'rhq-call-command "import" dirname
+         (when depth (list "--depth" (number-to-string depth)))))
 
 ;;;###autoload
 (defun rhq-add (dirname)
