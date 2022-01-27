@@ -223,5 +223,38 @@ With prefix argument, you can explicitly pass ROOT and VCS from minibuffer."
    `(,@(when root (list "--root" root))
      ,@(when vcs (list "--vcs" vcs)))))
 
+
+;;;; `projectile' integration
+
+(defvar projectile-known-projects)
+(declare-function projectile-relevant-known-projects "ext:projectile")
+
+;;;###autoload
+(defun rhq-projectile-reload-projects ()
+  "Reload project list from rhq and put it into `projectile-known-projects'."
+  (interactive)
+  (setq projectile-known-projects
+        (delete-dups
+         (nconc projectile-known-projects
+                (rhq-get-project-list)))))
+
+(defun rhq-projectile--advice-reload-projects (&rest _)
+  "Reload project list from rhq and put it into `projectile-known-projects'.
+Same as `rhq-projectile-reload-projects' except it can receive any number of
+arguments."
+  (rhq-projectile-reload-projects))
+
+;;;###autoload
+(define-minor-mode rhq-projectile-mode
+  "Global minor mode to integrate `rhq' and `projectile'.
+
+It automatically reload projects from rhq and put it into
+`projectile-known-projects'."
+  :global t
+  :group 'rhq
+  (if rhq-projectile-mode
+      (advice-add #'projectile-relevant-known-projects :before #'rhq-projectile--advice-reload-projects)
+    (advice-remove #'projectile-relevant-known-projects #'rhq-projectile--advice-reload-projects)))
+
 (provide 'rhq)
 ;;; rhq.el ends here
