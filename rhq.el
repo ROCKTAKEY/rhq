@@ -5,7 +5,7 @@
 ;; Author: ROCKTAKEY <rocktakey@gmail.com>
 ;; Keywords: tools, extensions
 
-;; Version: 0.1.6
+;; Version: 0.2.0
 ;; Package-Requires: ((emacs "24.3"))
 ;; URL: https://github.com/ROCKTAKEY/rhq
 ;; This program is free software; you can redistribute it and/or modify
@@ -151,11 +151,53 @@ If NOCONFIRM is non-nil, you are not asked confirmation."
   (rhq-call-command "clone" url))
 
 ;;;###autoload
+(defun rhq-refresh ()
+  "Rhq executable refreshes project list."
+  (interactive)
+  (rhq-call-command "refresh"))
+
+;;;###autoload
 (defun rhq-import (dirname)
   "Import DIRNAME as root of rhq-managed projects.
 Directories in DIRNAME are regarded as one of project."
   (interactive "DImport root of projects: ")
   (rhq-call-command "import" dirname))
+
+;;;###autoload
+(defun rhq-add (dirname)
+  "Add DIRNAME as rhq-managed project."
+  (interactive "DImport project: ")
+  (rhq-call-command "add" dirname))
+
+(defconst rhq--new-vcs-list
+  '("git"
+    "hg"
+    "darcs"
+    "pijul")
+  "Possible values as --vcs argument on \"rhq new\".")
+
+;;;###autoload
+(defun rhq-new (name &optional root vcs)
+  "Create new repository named NAME.
+NAME can be \"github.com/username/repo\", \"username/repo\" and so on.
+If ROOT is non-nil, it should be path to destination of new repository.
+If VCS is non-nil, it should be version control system name:
+  git(default), hg, darcs, pijul
+
+With prefix argument, you can explicitly pass ROOT and VCS from minibuffer."
+  (interactive
+   `(,(read-string "New repository name (like \"username/repo\"): ")
+     ,@(when prefix-arg
+         (list
+          (read-directory-name "Root directory name (where the repository is placed): " default-directory)
+          (completing-read "Version control system: "
+                           rhq--new-vcs-list)))))
+  (apply
+   #'rhq-call-command
+   "new"
+   name
+   `(,@(when root (list "--root" root))
+     ,@(when vcs (list "--vcs" vcs)))))
 
 (provide 'rhq)
 ;;; rhq.el ends here
