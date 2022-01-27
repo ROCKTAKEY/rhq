@@ -145,12 +145,6 @@ If NOCONFIRM is non-nil, you are not asked confirmation."
   (find-file filename))
 
 ;;;###autoload
-(defun rhq-clone (url)
-  "Clone repository from URL by rhq."
-  (interactive "sProject URL: ")
-  (rhq-call-command "clone" url))
-
-;;;###autoload
 (defun rhq-refresh ()
   "Rhq executable refreshes project list."
   (interactive)
@@ -175,6 +169,23 @@ Directories in DIRNAME are regarded as one of project."
     "darcs"
     "pijul")
   "Possible values as --vcs argument on \"rhq new\".")
+
+;;;###autoload
+(defun rhq-clone (url &optional root vcs)
+  "Clone repository from URL by rhq."
+  (interactive
+   `(,(read-string "Project URL (\"username/repo\" is also allowed): ")
+     ,@(when prefix-arg
+         (list
+          (read-directory-name "Root directory name (where the repository is placed): " default-directory)
+          (completing-read "Version control system: "
+                           rhq--vcs-list)))))
+  (apply
+   #'rhq-call-command
+   "clone"
+   url
+   `(,@(when root (list "--root" root))
+     ,@(when vcs (list "--vcs" vcs)))))
 
 ;;;###autoload
 (defun rhq-new (name &optional root vcs)
