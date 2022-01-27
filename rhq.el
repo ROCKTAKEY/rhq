@@ -5,7 +5,7 @@
 ;; Author: ROCKTAKEY <rocktakey@gmail.com>
 ;; Keywords: tools, extensions
 
-;; Version: 0.1.5
+;; Version: 0.1.6
 ;; Package-Requires: ((emacs "24.3"))
 ;; URL: https://github.com/ROCKTAKEY/rhq
 ;; This program is free software; you can redistribute it and/or modify
@@ -80,6 +80,20 @@ backslash quoting, is respected."
    "Project: "
    (rhq-get-project-list)))
 
+(defun rhq--check-executable-availability ()
+  "Confirm `rhq-executable' exist as executable."
+  (unless (executable-find rhq-executable)
+    (error "\"rhq\" is not available. Please run `rhq-install-executable' and install it")))
+
+;;;###autoload
+(defun rhq-install-executable (&optional noconfirm)
+  "Install rhq.
+If NOCONFIRM is non-nil, you are not asked confirmation."
+  (interactive "P")
+  (when (or noconfirm
+            (y-or-n-p "\"Cargo\" is prerequisited. Install rhq? "))
+    (async-shell-command "cargo install rhq")))
+
 ;;;###autoload
 (defun rhq-call-command (subcommand &rest args)
   "Call `rhq-executable' with SUBCOMMAND and ARGS, asynchronously."
@@ -90,6 +104,7 @@ backslash quoting, is respected."
      rhq--subcommands)
     (rhq--split-string-shell-command
      (read-from-minibuffer "Arguments: "))))
+  (rhq--check-executable-availability)
   (let ((async-shell-command-display-buffer nil))
    (async-shell-command
    (apply #'rhq--make-shell-command-string
@@ -101,6 +116,7 @@ backslash quoting, is respected."
 ;;;###autoload
 (defun rhq-call-command-to-string (subcommand &rest args)
   "Call `rhq-executable' with SUBCOMMAND and ARGS, and get output as string."
+  (rhq--check-executable-availability)
   (shell-command-to-string
    (apply #'rhq--make-shell-command-string
           rhq-executable
