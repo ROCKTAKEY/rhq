@@ -91,7 +91,7 @@ backslash quoting, is respected."
 If NOCONFIRM is non-nil, you are not asked confirmation."
   (interactive "P")
   (when (or noconfirm
-            (y-or-n-p "\"Cargo\" is prerequisited. Install rhq?"))
+            (y-or-n-p "\"Cargo\" is prerequisited. Install rhq? "))
     (async-shell-command "cargo install rhq")))
 
 ;;;###autoload
