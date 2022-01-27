@@ -182,8 +182,8 @@ as \"--depth\" argument."
   "Clone repository from URL by rhq.
 
 If ROOT is non-nil, it should be path to destination of new repository.
-If VCS is non-nil, it should be version control system name:
-  git(default), hg, darcs, pijul
+If VCS is non-nil, it should be version control system name defined in
+`rhq--vcs-list'.
 
 With prefix argument, you can explicitly pass ROOT and VCS from minibuffer."
   (interactive
@@ -205,8 +205,8 @@ With prefix argument, you can explicitly pass ROOT and VCS from minibuffer."
   "Create new repository named NAME.
 NAME can be \"github.com/username/repo\", \"username/repo\" and so on.
 If ROOT is non-nil, it should be path to destination of new repository.
-If VCS is non-nil, it should be version control system name:
-  git(default), hg, darcs, pijul
+If VCS is non-nil, it should be version control system name defined in
+`rhq--vcs-list'.
 
 With prefix argument, you can explicitly pass ROOT and VCS from minibuffer."
   (interactive
