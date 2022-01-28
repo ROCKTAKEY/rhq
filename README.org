@@ -67,5 +67,9 @@ Find project and find file in the directory.
 You can turn on ~rhq-projectile-mode~ to integrate rhq and [[https://github.com/bbatsov/projectile][projectile]].
 It reloads project list from rhq before projectile retrive known project list.
 
+* Commands for developer
+** ~rhq-call-command-to-string~
+Return list of projects managed by rhq.
+
 * License
   This package is licensed by GPLv3. See [[file:LICENSE][LICENSE]].
