@@ -39,9 +39,5 @@
 (ert-deftest rhq--check-executable-availability ()
   (rhq--check-executable-availability))
 
-(ert-deftest rhq-clone ()
-  (rhq-clone "https://github.com/ubnt-intrepid/rhq")
-  (rhq-clone "ROCKTAKEY/rhq"))
-
 (provide 'rhq-test)
 ;;; rhq-test.el ends here
