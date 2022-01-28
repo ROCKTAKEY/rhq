@@ -31,7 +31,7 @@ Clone repository and put it into ~rhq~ management. It takes one argument ~URL~
 On interactive usage, ~ROOT~ and ~VCS~ can be passed only with prefix argument.
 ~ROOT~ is directory where the project placed. Note that ~ROOT~ is NOT the name of project directory,
 but name of directory in which rhq-managed projects is placed.
-By default, ~~/rhq/~ is used.
+By default, =~/rhq/= is used.
 
 ~VCS~ is name of version control system which manage the project.
 By default, ~git~ is used.
@@ -50,7 +50,7 @@ Refresh rhq cache. Rhq has cache of project list to keep performance of ~rhq lis
 So you should refresh when delete your project, rename project, and so on.
 
 ** ~rhq-import~
-Import root of projects. In the other words, use the directory as root directory like ~~/rhq/~.
+Import root of projects. In the other words, use the directory as root directory like =~/rhq/=.
 All project in it is managed by rhq.
 
 * Commands to browse project managed by rhq
