@@ -4,6 +4,65 @@
 [[https://github.com/ROCKTAKEY/rhq/actions][https://img.shields.io/github/workflow/status/ROCKTAKEY/rhq/CI/master.svg?style=flat-square]]
 * Emacs client for rhq
 Use [[https://github.com/ubnt-intrepid/rhq][rhq]] with Emacs!
+
 * How to Use?
+1. Install rhq
+   - Run ~M-x rhq-install-executable~ or directly install by the command:
+   #+BEGIN_SRC shell -n
+     cargo install rhq
+   #+END_SRC
+2. Create ~~/.config/rhq/config.toml~ (needed, even allowed to be empty)
+3. Clone project by =M-x rhq-clone= or create new project by =M-x rhq-new=.
+   The argument like "username/repo" means ~git clone https://github.com/username/repo~.
+4. Browse projects by =rhq-find-file= or =rhq-open-project=.
+   - =rhq-find-file= : Find project and find file in it.
+   - =rhq-open-project= : Find project and open the directory.
+5. Enjoy!
+
+* Commands to run rhq
+** ~rhq-clone~
+Clone repository and put it into ~rhq~ management. It takes one argument ~URL~
+(and two optional arguments, ~ROOT~ and ~VCS~).
+
+~URL~ can be:
+- URL like ~https://github.com/username/repo~
+- Abbreviated URL like ~username/repo~ (default host can be set in =config.toml=)
+
+On interactive usage, ~ROOT~ and ~VCS~ can be passed only with prefix argument.
+~ROOT~ is directory where the project placed. Note that ~ROOT~ is NOT the name of project directory,
+but name of directory in which rhq-managed projects is placed.
+By default, ~~/rhq/~ is used.
+
+~VCS~ is name of version control system which manage the project.
+By default, ~git~ is used.
+
+** ~rhq-new~
+Create new repository and put it into ~rhq~ management. This function is same as ~rhq-clone~
+except first argument can be invalid URL (because this command does NOT clone any repository,
+but just create new repository locally). See also [[~rhq-clone~]].
+
+** ~rhq-add~
+Add local existing project into rhq management.
+For example, adding ~./emacs.d~ and other config file is useful.
+
+** ~rhq-refresh~
+Refresh rhq cache. Rhq has cache of project list to keep performance of ~rhq list~.
+So you should refresh when delete your project, rename project, and so on.
+
+** ~rhq-import~
+Import root of projects. In the other words, use the directory as root directory like ~~/rhq/~.
+All project in it is managed by rhq.
+
+* Commands to browse project managed by rhq
+** ~rhq-open-project~
+Find project and open the directory.
+
+** ~rhq-find-file~
+Find project and find file in the directory.
+
+* Projectile integration
+You can turn on ~rhq-projectile-mode~ to integrate rhq and [[projectile][https://github.com/bbatsov/projectile]].
+It reloads project list from rhq before projectile retrive known project list.
+
 * License
   This package is licensed by GPLv3. See [[file:LICENSE][LICENSE]].
