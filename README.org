@@ -61,7 +61,7 @@ Find project and open the directory.
 Find project and find file in the directory.
 
 * Projectile integration
-You can turn on ~rhq-projectile-mode~ to integrate rhq and [[projectile][https://github.com/bbatsov/projectile]].
+You can turn on ~rhq-projectile-mode~ to integrate rhq and [[https://github.com/bbatsov/projectile][projectile]].
 It reloads project list from rhq before projectile retrive known project list.
 
 * License
