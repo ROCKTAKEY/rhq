@@ -21,6 +21,9 @@ Use [[https://github.com/ubnt-intrepid/rhq][rhq]] with Emacs!
 
 * Commands to run rhq
 ** ~rhq-clone~
+:PROPERTIES:
+:CUSTOM_ID: rhq-clone
+:END:
 Clone repository and put it into ~rhq~ management. It takes one argument ~URL~
 (and two optional arguments, ~ROOT~ and ~VCS~).
 
@@ -39,7 +42,7 @@ By default, ~git~ is used.
 ** ~rhq-new~
 Create new repository and put it into ~rhq~ management. This function is same as ~rhq-clone~
 except first argument can be invalid URL (because this command does NOT clone any repository,
-but just create new repository locally). See also [[~rhq-clone~]].
+but just create new repository locally). See also [[#rhq-clone]].
 
 ** ~rhq-add~
 Add local existing project into rhq management.
