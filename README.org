@@ -11,7 +11,11 @@ Use [[https://github.com/ubnt-intrepid/rhq][rhq]] with Emacs!
    #+BEGIN_SRC shell -n
      cargo install rhq
    #+END_SRC
-2. Create ~~/.config/rhq/config.toml~ (needed, even allowed to be empty)
+2. Create =~/.config/rhq/config.toml= (needed, even allowed to be empty)
+   #+BEGIN_SRC shell -n
+     mkdir ~/.config/rhq -p
+     touch ~/.config/rhq/config.toml
+   #+END_SRC
 3. Clone project by =M-x rhq-clone= or create new project by =M-x rhq-new=.
    The argument like "username/repo" means ~git clone https://github.com/username/repo~.
 4. Browse projects by =rhq-find-file= or =rhq-open-project=.
