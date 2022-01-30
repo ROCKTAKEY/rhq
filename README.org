@@ -5,6 +5,11 @@
 * Emacs client for rhq
 Use [[https://github.com/ubnt-intrepid/rhq][rhq]] with Emacs!
 
+[[https://github.com/ubnt-intrepid/rhq][Rhq]] is local repository manager like [[https://github.com/x-motemen/ghq][ghq]].
+You can clone or create any repositories with ~rhq~ command, and manage them with ~rhq~.
+By default, each repository is put in =~/rhq/=, even though repository in other directory can be managed
+by using ~rhq add~.
+
 * How to Use?
 1. Install rhq
    - Run ~M-x rhq-install-executable~ or directly install by the command:
