@@ -5,7 +5,7 @@
 ;; Author: ROCKTAKEY <rocktakey@gmail.com>
 ;; Keywords: tools, extensions
 
-;; Version: 0.5.1
+;; Version: 0.5.2
 ;; Package-Requires: ((emacs "24.4"))
 ;; URL: https://github.com/ROCKTAKEY/rhq
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,9 @@
 ;;; Commentary:
 
 ;; Client for rhq.
+
+;; The command rhq is available on https://github.com/ubnt-intrepid/rhq.
+;; This command manage all your repository.
 
 ;;; Code:
 
