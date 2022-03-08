@@ -88,6 +88,11 @@ backslash quoting, is respected."
   (unless (executable-find rhq-executable)
     (error "\"rhq\" is not available. Please run `rhq-install-executable' and install it")))
 
+(defun rhq--process-exit-normally-p (process)
+  "Return non-nil if PROCESS exited normally."
+  (and (memq (process-status process) '(exit closed failed signal))
+       (= (process-exit-status process) 0)))
+
 ;;;###autoload
 (defun rhq-install-executable (&optional noconfirm)
   "Install rhq.
