@@ -124,7 +124,8 @@ If NOCONFIRM is non-nil, you are not asked confirmation."
             rhq-executable
             subcommand
             args)
-     rhq-async-buffer)))
+     rhq-async-buffer)
+    (get-buffer-process (get-buffer rhq-async-buffer))))
 
 ;;;###autoload
 (defun rhq-call-command-to-string (subcommand &rest args)
