@@ -69,6 +69,9 @@ All project in it is managed by rhq.
 ** ~rhq-open-project~
 Find project and open the directory.
 
+** ~rhq-open-project-or-clone~
+Same as ~rhq-open-project~ except that clone repository if it is not found.
+
 ** ~rhq-find-file~
 Find project and find file in the directory.
 
@@ -77,8 +80,13 @@ You can turn on ~rhq-projectile-mode~ to integrate rhq and [[https://github.com/
 It reloads project list from rhq before projectile retrive known project list.
 
 * Commands for developer
-** ~rhq-call-command-to-string~
+** ~rhq-get-project-list~
 Return list of projects managed by rhq.
+Absolute path is returned by default.
+
+If optional argument ~ROOT~ is non-nil, it should be directory.
+Then, this function return relative path when the path is rooted by ~ROOT~.
+Note that the path is not rooted by ~ROOT~, it remains absolute path.
 
 * License
   This package is licensed by GPLv3. See [[file:LICENSE][LICENSE]].
