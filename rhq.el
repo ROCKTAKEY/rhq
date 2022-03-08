@@ -83,11 +83,19 @@ backslash quoting, is respected."
    args
    " "))
 
-(defun rhq--read-project ()
-  "Read project from user input."
+(defun rhq--read-project (root &optional no-require-match)
+  "Read project from user input.
+This function listens relative path from ROOT if it is rooted from ROOT.
+Otherwise, listens absolute path.
+
+If NO-REQUIRE-MATCH is non-nil,  this function can return non-project.
+It should be string which describe what string is needed as
+unmatched returned string."
   (completing-read
-   "Project: "
-   (rhq-get-project-list)))
+   (if no-require-match
+       (format "Project or %s: " no-require-match)
+     "Project: ")
+   (rhq-get-project-list root) nil (not no-require-match)))
 
 (defun rhq--check-executable-availability ()
   "Confirm `rhq-executable' exist as executable."
@@ -154,24 +162,34 @@ If NOCONFIRM is non-nil, you are not asked confirmation."
           args)))
 
 ;;;###autoload
-(defun rhq-get-project-list ()
-  "Get list of projects managed by rhq."
-  (split-string (rhq-call-command-to-string "list") "\n" t))
+(defun rhq-get-project-list (&optional root)
+  "Get list of projects managed by rhq, relatively from ROOT.
+If ROOT is nil, return absolute paths."
+  (mapcar (lambda (dir)
+            (let ((relative-dir (file-relative-name dir root)))
+              (if (or (not root)
+                      (string-match-p "\\.\\." relative-dir))
+                  dir
+                relative-dir)))
+          (split-string (rhq-call-command-to-string "list") "\n" t)))
 
 ;;;###autoload
 (defun rhq-open-project (dirname)
   "Find project directory named DIRNAME from project list by \"rhq list\"."
   (interactive
-   (list (rhq--read-project)))
-  (find-file dirname))
+   (list (rhq--read-project rhq-root-directory)))
+  (let ((default-directory rhq-root-directory))
+   (find-file dirname)))
+
 
 ;;;###autoload
 (defun rhq-find-file (filename)
   "Read project and find file named FILENAME in it."
   (interactive
-   (let ((project (rhq--read-project)))
-     (list (read-file-name "Find file: "
-                           project project))))
+   (let ((project (rhq--read-project rhq-root-directory)))
+     (list (let ((default-directory rhq-root-directory))
+             (read-file-name "Find file: "
+                             project project)))))
   (find-file filename))
 
 ;;;###autoload
@@ -266,7 +284,7 @@ With prefix argument, you can explicitly pass ROOT and VCS from minibuffer."
   (setq projectile-known-projects
         (delete-dups
          (nconc projectile-known-projects
-                (rhq-get-project-list)))))
+                (rhq-get-project-list rhq-root-directory)))))
 
 (defun rhq-projectile--advice-reload-projects (&rest _)
   "Reload project list from rhq and put it into `projectile-known-projects'.
