@@ -31,6 +31,7 @@
 ;;; Code:
 
 (require 'shell)
+(require 'cl-lib)
 
 (defgroup rhq nil
   "Client for rhq command."
@@ -97,6 +98,21 @@ backslash quoting, is respected."
   "Return non-nil if PROCESS exited normally."
   (and (memq (process-status process) '(exit closed failed signal))
        (= (process-exit-status process) 0)))
+
+(defun rhq--dirname-or-url-exist (dirname-or-url)
+  "Return absolute dir name predicted from DIRNAME-OR-URL, or nil."
+  (let* ((dirname
+          (save-match-data
+            (and (string-match "\\(?:https?://\\)?\\(.*\\)" dirname-or-url)
+                 (match-string 1 dirname-or-url))))
+         (absolute-dirname (and
+                            dirname
+                            (cl-some
+                             (lambda (project)
+                               (when (string-match-p (regexp-quote dirname) project)
+                                 project))
+                             (rhq-get-project-list)))))
+    absolute-dirname))
 
 ;;;###autoload
 (defun rhq-install-executable (&optional noconfirm)
