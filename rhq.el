@@ -59,6 +59,11 @@ backslash quoting, is respected."
   :group 'rhq
   :type 'string)
 
+(defcustom rhq-root-directory "~/rhq"
+  "Default root directory."
+  :group 'rhq
+  :type 'directory)
+
 (defconst rhq--subcommands
   '("add"
     "clone"
