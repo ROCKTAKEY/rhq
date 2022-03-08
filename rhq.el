@@ -5,7 +5,7 @@
 ;; Author: ROCKTAKEY <rocktakey@gmail.com>
 ;; Keywords: tools, extensions
 
-;; Version: 0.5.2
+;; Version: 0.6.0
 ;; Package-Requires: ((emacs "24.4"))
 ;; URL: https://github.com/ROCKTAKEY/rhq
 ;; This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 ;;; Code:
 
 (require 'shell)
+(require 'cl-lib)
 
 (defgroup rhq nil
   "Client for rhq command."
@@ -59,6 +60,11 @@ backslash quoting, is respected."
   :group 'rhq
   :type 'string)
 
+(defcustom rhq-root-directory "~/rhq"
+  "Default root directory."
+  :group 'rhq
+  :type 'directory)
+
 (defconst rhq--subcommands
   '("add"
     "clone"
@@ -77,16 +83,44 @@ backslash quoting, is respected."
    args
    " "))
 
-(defun rhq--read-project ()
-  "Read project from user input."
+(defun rhq--read-project (root &optional no-require-match)
+  "Read project from user input.
+This function listens relative path from ROOT if it is rooted from ROOT.
+Otherwise, listens absolute path.
+
+If NO-REQUIRE-MATCH is non-nil,  this function can return non-project.
+It should be string which describe what string is needed as
+unmatched returned string."
   (completing-read
-   "Project: "
-   (rhq-get-project-list)))
+   (if no-require-match
+       (format "Project or %s: " no-require-match)
+     "Project: ")
+   (rhq-get-project-list root) nil (not no-require-match)))
 
 (defun rhq--check-executable-availability ()
   "Confirm `rhq-executable' exist as executable."
   (unless (executable-find rhq-executable)
     (error "\"rhq\" is not available. Please run `rhq-install-executable' and install it")))
+
+(defun rhq--process-exit-normally-p (process)
+  "Return non-nil if PROCESS exited normally."
+  (and (memq (process-status process) '(exit closed failed signal))
+       (= (process-exit-status process) 0)))
+
+(defun rhq--dirname-or-url-exist (dirname-or-url)
+  "Return absolute dir name predicted from DIRNAME-OR-URL, or nil."
+  (let* ((dirname
+          (save-match-data
+            (and (string-match "\\(?:https?://\\)?\\(.*\\)" dirname-or-url)
+                 (match-string 1 dirname-or-url))))
+         (absolute-dirname (and
+                            dirname
+                            (cl-some
+                             (lambda (project)
+                               (when (string-match-p (regexp-quote dirname) project)
+                                 project))
+                             (rhq-get-project-list)))))
+    absolute-dirname))
 
 ;;;###autoload
 (defun rhq-install-executable (&optional noconfirm)
@@ -114,7 +148,8 @@ If NOCONFIRM is non-nil, you are not asked confirmation."
             rhq-executable
             subcommand
             args)
-     rhq-async-buffer)))
+     rhq-async-buffer)
+    (get-buffer-process (get-buffer rhq-async-buffer))))
 
 ;;;###autoload
 (defun rhq-call-command-to-string (subcommand &rest args)
@@ -127,24 +162,49 @@ If NOCONFIRM is non-nil, you are not asked confirmation."
           args)))
 
 ;;;###autoload
-(defun rhq-get-project-list ()
-  "Get list of projects managed by rhq."
-  (split-string (rhq-call-command-to-string "list") "\n" t))
+(defun rhq-get-project-list (&optional root)
+  "Get list of projects managed by rhq, relatively from ROOT.
+If ROOT is nil, return absolute paths."
+  (mapcar (lambda (dir)
+            (let ((relative-dir (file-relative-name dir root)))
+              (if (or (not root)
+                      (string-match-p "\\.\\." relative-dir))
+                  dir
+                relative-dir)))
+          (split-string (rhq-call-command-to-string "list") "\n" t)))
 
 ;;;###autoload
 (defun rhq-open-project (dirname)
   "Find project directory named DIRNAME from project list by \"rhq list\"."
   (interactive
-   (list (rhq--read-project)))
-  (find-file dirname))
+   (list (rhq--read-project rhq-root-directory)))
+  (let ((default-directory rhq-root-directory))
+   (find-file dirname)))
+
+;;;###autoload
+(defun rhq-open-project-or-clone (dirname-or-url)
+  "Find project directory named DIRNAME-OR-URL from list by \"rhq list\".
+When DIRNAME-OR-URL is not found, it is passed to `rhq-clone' to clone project."
+  (interactive
+   (list (rhq--read-project rhq-root-directory "project URL (\"username/repo\" is also allowed)")))
+  (if (or (let ((default-directory rhq-root-directory))
+            (file-exists-p dirname-or-url)))
+      (find-file dirname-or-url)
+    (set-process-sentinel
+     (rhq-clone dirname-or-url)
+     (lambda (process _)
+       (when (rhq--process-exit-normally-p process)
+         (let* ((dirname (rhq--dirname-or-url-exist dirname-or-url)))
+           (find-file (expand-file-name  dirname))))))))
 
 ;;;###autoload
 (defun rhq-find-file (filename)
   "Read project and find file named FILENAME in it."
   (interactive
-   (let ((project (rhq--read-project)))
-     (list (read-file-name "Find file: "
-                           project project))))
+   (let ((project (rhq--read-project rhq-root-directory)))
+     (list (let ((default-directory rhq-root-directory))
+             (read-file-name "Find file: "
+                             project project)))))
   (find-file filename))
 
 ;;;###autoload
@@ -239,7 +299,7 @@ With prefix argument, you can explicitly pass ROOT and VCS from minibuffer."
   (setq projectile-known-projects
         (delete-dups
          (nconc projectile-known-projects
-                (rhq-get-project-list)))))
+                (rhq-get-project-list rhq-root-directory)))))
 
 (defun rhq-projectile--advice-reload-projects (&rest _)
   "Reload project list from rhq and put it into `projectile-known-projects'.
