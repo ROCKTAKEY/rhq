@@ -183,7 +183,7 @@ If ROOT is nil, return absolute paths."
 
 ;;;###autoload
 (defun rhq-open-project-or-clone (dirname-or-url)
-  "Find project directory named DIRNAME-OR-URL from project list by \"rhq list\".
+  "Find project directory named DIRNAME-OR-URL from list by \"rhq list\".
 When DIRNAME-OR-URL is not found, it is passed to `rhq-clone' to clone project."
   (interactive
    (list (rhq--read-project rhq-root-directory "project URL (\"username/repo\" is also allowed)")))
