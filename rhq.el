@@ -5,7 +5,7 @@
 ;; Author: ROCKTAKEY <rocktakey@gmail.com>
 ;; Keywords: tools, extensions
 
-;; Version: 0.6.0
+;; Version: 0.6.1
 ;; Package-Requires: ((emacs "24.4"))
 ;; URL: https://github.com/ROCKTAKEY/rhq
 ;; This program is free software; you can redistribute it and/or modify
@@ -187,15 +187,15 @@ If ROOT is nil, return absolute paths."
 When DIRNAME-OR-URL is not found, it is passed to `rhq-clone' to clone project."
   (interactive
    (list (rhq--read-project rhq-root-directory "project URL (\"username/repo\" is also allowed)")))
-  (if (or (let ((default-directory rhq-root-directory))
-            (file-exists-p dirname-or-url)))
-      (find-file dirname-or-url)
-    (set-process-sentinel
-     (rhq-clone dirname-or-url)
-     (lambda (process _)
-       (when (rhq--process-exit-normally-p process)
-         (let* ((dirname (rhq--dirname-or-url-exist dirname-or-url)))
-           (find-file (expand-file-name  dirname))))))))
+  (let ((absolute-path (rhq--dirname-or-url-exist dirname-or-url)))
+    (if absolute-path
+        (find-file absolute-path)
+      (set-process-sentinel
+       (rhq-clone dirname-or-url)
+       (lambda (process _)
+         (when (rhq--process-exit-normally-p process)
+           (let* ((dirname (rhq--dirname-or-url-exist dirname-or-url)))
+             (find-file (expand-file-name  dirname)))))))))
 
 ;;;###autoload
 (defun rhq-find-file (filename)
