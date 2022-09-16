@@ -5,7 +5,7 @@
 ;; Author: ROCKTAKEY <rocktakey@gmail.com>
 ;; Keywords: tools, extensions
 
-;; Version: 0.7.0
+;; Version: 0.7.1
 ;; Package-Requires: ((emacs "24.4"))
 ;; URL: https://github.com/ROCKTAKEY/rhq
 ;; This program is free software; you can redistribute it and/or modify
@@ -117,7 +117,8 @@ unmatched returned string."
                             dirname
                             (cl-some
                              (lambda (project)
-                               (when (string-match-p (regexp-quote dirname) project)
+                               (when (file-equal-p (expand-file-name dirname rhq-root-directory)
+                                                   project)
                                  project))
                              (rhq-get-project-list)))))
     absolute-dirname))
