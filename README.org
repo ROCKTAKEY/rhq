@@ -79,6 +79,13 @@ Find project and find file in the directory.
 You can turn on ~rhq-projectile-mode~ to integrate rhq and [[https://github.com/bbatsov/projectile][projectile]].
 It reloads project list from rhq before projectile retrive known project list.
 
+* Consult integration
+You can use =rhq-consult-source-project-directory= as source of [[https://github.com/minad/consult][consult]].
+For example:
+#+begin_src emacs-lisp :tangle yes
+  (add-to-list 'consult-buffer-sources #'rhq-consult-source-project-directory)
+#+end_src
+
 * Commands for developer
 ** ~rhq-get-project-list~
 Return list of projects managed by rhq.

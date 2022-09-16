@@ -5,7 +5,7 @@
 ;; Author: ROCKTAKEY <rocktakey@gmail.com>
 ;; Keywords: tools, extensions
 
-;; Version: 0.6.1
+;; Version: 0.7.0
 ;; Package-Requires: ((emacs "24.4"))
 ;; URL: https://github.com/ROCKTAKEY/rhq
 ;; This program is free software; you can redistribute it and/or modify
@@ -318,6 +318,20 @@ It automatically reload projects from rhq and put it into
   (if rhq-projectile-mode
       (advice-add #'projectile-relevant-known-projects :before #'rhq-projectile--advice-reload-projects)
     (advice-remove #'projectile-relevant-known-projects #'rhq-projectile--advice-reload-projects)))
+
+
+;;;; `consult' integration
+
+(defvar rhq-consult-source-project-directory
+  '( :name "Project Directory"
+     :narrow (?P . "Projects")
+     :hidden nil
+     :category file
+     :face consult-file
+     :history file-name-history
+     :state consult--file-state
+     :items rhq-get-project-list)
+  "Project file candidate source for `consult-buffer'.")
 
 (provide 'rhq)
 ;;; rhq.el ends here
