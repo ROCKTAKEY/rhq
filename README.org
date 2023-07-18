@@ -1,7 +1,7 @@
 [[https://github.com/ROCKTAKEY/rhq][https://img.shields.io/github/tag/ROCKTAKEY/rhq.svg?style=flat-square]]
 [[file:LICENSE][https://img.shields.io/github/license/ROCKTAKEY/rhq.svg?style=flat-square]]
 [[https://codecov.io/gh/ROCKTAKEY/rhq?branch=master][https://img.shields.io/codecov/c/github/ROCKTAKEY/rhq.svg?style=flat-square]]
-[[https://github.com/ROCKTAKEY/rhq/actions][https://img.shields.io/github/workflow/status/ROCKTAKEY/rhq/CI/master.svg?style=flat-square]]
+[[https://github.com/ROCKTAKEY/rhq/actions][https://img.shields.io/github/actions/workflow/status/ROCKTAKEY/rhq/CI.yml.svg?branch=master&style=flat-square]]
 * Emacs client for rhq
 Use [[https://github.com/ubnt-intrepid/rhq][rhq]] with Emacs!
 
