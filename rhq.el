@@ -288,6 +288,42 @@ With prefix argument, you can explicitly pass ROOT and VCS from minibuffer."
      ,@(when vcs (list "--vcs" vcs)))))
 
 
+;;;; `pcomplete' integration
+
+;;;###autoload
+(defun pcomplete/rhq ()
+  "Completion for rhq."
+  (pcomplete-here* rhq--subcommands)
+  (cond
+   ((pcomplete-match "clone")
+    (while (pcomplete-here* '("-h" "--help"
+                              "-s" "--ssh"
+                              "--root"
+                              "--vcs"))
+      (cond
+       ((pcomplete-match "--root")
+        (pcomplete-here (pcomplete-dirs)))
+       ((pcomplete-match "--vcs")
+        (pcomplete-here* rhq--vcs-list)))))
+   ((pcomplete-match "new")
+    (while (pcomplete-here* '("-h" "--help"
+                              "--root"
+                              "--vcs"))
+      (cond
+       ((pcomplete-match "--root")
+        (pcomplete-here (pcomplete-dirs)))
+       ((pcomplete-match "--vcs")
+        (pcomplete-here* rhq--vcs-list)))))
+   ((pcomplete-match (regexp-opt '("import" "add")))
+    (pcomplete-here (pcomplete-dirs)))
+   ((pcomplete-match "list")
+    (pcomplete-here* '("-h" "--help"
+                       "--format"))
+    (when (pcomplete-match "--format")
+      (pcomplete-here* '("name" "fullpath"))))
+   ))
+
+
 ;;;; `projectile' integration
 
 (defvar projectile-known-projects)
