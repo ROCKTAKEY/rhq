@@ -30,8 +30,9 @@
 
 ;;; Code:
 
-(require 'shell)
 (require 'cl-lib)
+(require 'shell)
+(require 'url-parse)
 
 (defgroup rhq nil
   "Client for rhq command."
@@ -106,6 +107,52 @@ unmatched returned string."
   "Return non-nil if PROCESS exited normally."
   (and (memq (process-status process) '(exit closed failed signal))
        (= (process-exit-status process) 0)))
+
+(defcustom rhq-default-protocol "https"
+  "Default protocol used when it omitted.
+For example, \"example.com/user/repo\" is transformed to
+\"https://example.com/user/repo\" when the value is \"https\"."
+  :group 'rhq
+  :type '(choice
+          (const "https")
+          (const "ssh")))
+
+(defun rhq--make-dirname-url-cons (dirname-or-url root default-protocol)
+  "Return absolute path and URL from DIRNAME-OR-URL.
+ROOT is a path used as a root of relative path.
+DEFAULT-PROTOCOL is string which express protocol, such as \"http\" or \"ssh\"."
+  (let* ((url (url-generic-parse-url dirname-or-url))
+         (path (car (url-path-and-query url)))
+         (host (or (url-host url) ""))
+         (absolute-path (expand-file-name (concat host path) root)))
+    (cond
+     ;; URL with protocol,
+     ;; e.g. "https://example.com/user/repo" or "file:///path/to/repo".
+     ;; NOTE: "file" protocol is invalid for rhq
+     ((url-type url)
+      (let ((url-string (url-recreate-url url)))
+        (cons absolute-path url-string)))
+     ;; Absolute path,
+     ;; e.g. "/path/to/repo"
+     ((file-name-absolute-p path)
+      (cons absolute-path nil))
+     ;; Relative path, which means URL,
+     ;; e.g. "example.com/user/repo"
+     (t
+      (setf (url-type url) default-protocol)
+      (cons absolute-path
+            (url-recreate-url
+             (url-parse-make-urlobj
+              default-protocol          ; type
+              (url-user url)
+              (url-password url)
+              (url-host url)
+              (url-portspec url)
+              path                      ; filename
+              (url-target url)
+              (url-attributes url)
+              t                         ; fullness
+              )))))))
 
 (defun rhq--dirname-or-url-exist (dirname-or-url)
   "Return absolute dir name predicted from DIRNAME-OR-URL, or nil."
