@@ -53,4 +53,4 @@ jobs:
         with:
           version: '28.2'
       - uses: conao3/setup-keg@master
-      - run: make lint
+      - run: keg lint
