@@ -156,22 +156,6 @@ DEFAULT-PROTOCOL is string which express protocol, such as \"http\" or \"ssh\"."
               t                         ; fullness
               )))))))
 
-(defun rhq--dirname-or-url-exist (dirname-or-url)
-  "Return absolute dir name predicted from DIRNAME-OR-URL, or nil."
-  (let* ((dirname
-          (save-match-data
-            (and (string-match "\\(?:https?://\\)?\\(.*\\)" dirname-or-url)
-                 (match-string 1 dirname-or-url))))
-         (absolute-dirname (and
-                            dirname
-                            (cl-some
-                             (lambda (project)
-                               (when (file-equal-p (expand-file-name dirname rhq-root-directory)
-                                                   project)
-                                 project))
-                             (rhq-get-project-list)))))
-    absolute-dirname))
-
 ;;;###autoload
 (defun rhq-install-executable (&optional noconfirm)
   "Install rhq.
@@ -237,15 +221,17 @@ If ROOT is nil, return absolute paths."
 When DIRNAME-OR-URL is not found, it is passed to `rhq-clone' to clone project."
   (interactive
    (list (rhq--read-project rhq-root-directory "project URL (\"username/repo\" is also allowed)")))
-  (let ((absolute-path (rhq--dirname-or-url-exist dirname-or-url)))
-    (if absolute-path
+  (let* ((cons (rhq--make-dirname-url-cons dirname-or-url rhq-root-directory rhq-default-protocol))
+         (absolute-path (car cons))
+         (url (cdr cons)))
+    (if (file-exists-p absolute-path)
         (find-file absolute-path)
       (set-process-sentinel
-       (rhq-clone dirname-or-url)
+       (rhq-clone url)
        (lambda (process _)
-         (when (rhq--process-exit-normally-p process)
-           (let* ((dirname (rhq--dirname-or-url-exist dirname-or-url)))
-             (find-file (expand-file-name  dirname)))))))))
+         (if (rhq--process-exit-normally-p process)
+             (find-file absolute-path)
+           (user-error "Cannot parse %s" dirname-or-url)))))))
 
 ;;;###autoload
 (defun rhq-find-file (filename)
