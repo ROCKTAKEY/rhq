@@ -224,14 +224,17 @@ When DIRNAME-OR-URL is not found, it is passed to `rhq-clone' to clone project."
   (let* ((cons (rhq--make-dirname-url-cons dirname-or-url rhq-root-directory rhq-default-protocol))
          (absolute-path (car cons))
          (url (cdr cons)))
-    (if (file-exists-p absolute-path)
-        (find-file absolute-path)
+    (cond
+     ((file-exists-p absolute-path)
+      (find-file absolute-path))
+     ((null url)
+      (user-error "Cannot parse %s as URL" dirname-or-url))
+     (t
       (set-process-sentinel
        (rhq-clone url)
        (lambda (process _)
          (if (rhq--process-exit-normally-p process)
-             (find-file absolute-path)
-           (user-error "Cannot parse %s" dirname-or-url)))))))
+             (find-file absolute-path))))))))
 
 ;;;###autoload
 (defun rhq-find-file (filename)
