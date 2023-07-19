@@ -118,7 +118,9 @@ For example, \"example.com/user/repo\" is transformed to
           (const "ssh")))
 
 (defun rhq--make-dirname-url-cons (dirname-or-url root default-protocol)
-  "Return absolute path and URL from DIRNAME-OR-URL.
+  "Return absolute path and URL from DIRNAME-OR-URL as cons cell.
+URL, which is the `cdr' of the cons cell, is nil when it cannot be caluculated.
+
 ROOT is a path used as a root of relative path.
 DEFAULT-PROTOCOL is string which express protocol, such as \"http\" or \"ssh\"."
   (let* ((url (url-generic-parse-url dirname-or-url))
