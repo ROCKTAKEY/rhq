@@ -143,14 +143,14 @@ If NOCONFIRM is non-nil, you are not asked confirmation."
     (rhq--split-string-shell-command
      (read-from-minibuffer "Arguments: "))))
   (rhq--check-executable-availability)
-  (let ((async-shell-command-display-buffer nil))
-    (async-shell-command
-     (apply #'rhq--make-shell-command-string
-            rhq-executable
-            subcommand
-            args)
-     rhq-async-buffer)
-    (get-buffer-process (get-buffer rhq-async-buffer))))
+  (let ((process (apply #'start-process
+                        (concat "rhq-" subcommand)
+                        rhq-executable
+                        subcommand args)))
+    (set-process-sentinel
+     process
+     (lambda (process event)
+       ))))
 
 ;;;###autoload
 (defun rhq-call-command-to-string (subcommand &rest args)
