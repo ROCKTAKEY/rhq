@@ -5,7 +5,7 @@
 ;; Author: ROCKTAKEY <rocktakey@gmail.com>
 ;; Keywords: tools, extensions
 
-;; Version: 0.7.1
+;; Version: 0.7.2
 ;; Package-Requires: ((emacs "24.4"))
 ;; URL: https://github.com/ROCKTAKEY/rhq
 ;; This program is free software; you can redistribute it and/or modify
@@ -30,8 +30,9 @@
 
 ;;; Code:
 
-(require 'shell)
 (require 'cl-lib)
+(require 'shell)
+(require 'url-parse)
 
 (defgroup rhq nil
   "Client for rhq command."
@@ -107,21 +108,53 @@ unmatched returned string."
   (and (memq (process-status process) '(exit closed failed signal))
        (= (process-exit-status process) 0)))
 
-(defun rhq--dirname-or-url-exist (dirname-or-url)
-  "Return absolute dir name predicted from DIRNAME-OR-URL, or nil."
-  (let* ((dirname
-          (save-match-data
-            (and (string-match "\\(?:https?://\\)?\\(.*\\)" dirname-or-url)
-                 (match-string 1 dirname-or-url))))
-         (absolute-dirname (and
-                            dirname
-                            (cl-some
-                             (lambda (project)
-                               (when (file-equal-p (expand-file-name dirname rhq-root-directory)
-                                                   project)
-                                 project))
-                             (rhq-get-project-list)))))
-    absolute-dirname))
+(defcustom rhq-default-protocol "https"
+  "Default protocol used when it omitted.
+For example, \"example.com/user/repo\" is transformed to
+\"https://example.com/user/repo\" when the value is \"https\"."
+  :group 'rhq
+  :type '(choice
+          (const "https")
+          (const "ssh")))
+
+(defun rhq--make-dirname-url-cons (dirname-or-url root default-protocol)
+  "Return absolute path and URL from DIRNAME-OR-URL as cons cell.
+URL, which is the `cdr' of the cons cell, is nil when it cannot be caluculated.
+
+ROOT is a path used as a root of relative path.
+DEFAULT-PROTOCOL is string which express protocol, such as \"http\" or \"ssh\"."
+  (let* ((url (url-generic-parse-url dirname-or-url))
+         (path (car (url-path-and-query url)))
+         (host (or (url-host url) ""))
+         (absolute-path (expand-file-name (concat host path) root)))
+    (cond
+     ;; URL with protocol,
+     ;; e.g. "https://example.com/user/repo" or "file:///path/to/repo".
+     ;; NOTE: "file" protocol is invalid for rhq
+     ((url-type url)
+      (let ((url-string (url-recreate-url url)))
+        (cons absolute-path url-string)))
+     ;; Absolute path,
+     ;; e.g. "/path/to/repo"
+     ((file-name-absolute-p path)
+      (cons absolute-path nil))
+     ;; Relative path, which means URL,
+     ;; e.g. "example.com/user/repo"
+     (t
+      (setf (url-type url) default-protocol)
+      (cons absolute-path
+            (url-recreate-url
+             (url-parse-make-urlobj
+              default-protocol          ; type
+              (url-user url)
+              (url-password url)
+              (url-host url)
+              (url-portspec url)
+              path                      ; filename
+              (url-target url)
+              (url-attributes url)
+              t                         ; fullness
+              )))))))
 
 ;;;###autoload
 (defun rhq-install-executable (&optional noconfirm)
@@ -187,16 +220,21 @@ If ROOT is nil, return absolute paths."
   "Find project directory named DIRNAME-OR-URL from list by \"rhq list\".
 When DIRNAME-OR-URL is not found, it is passed to `rhq-clone' to clone project."
   (interactive
-   (list (rhq--read-project rhq-root-directory "project URL (\"username/repo\" is also allowed)")))
-  (let ((absolute-path (rhq--dirname-or-url-exist dirname-or-url)))
-    (if absolute-path
-        (find-file absolute-path)
+   (list (rhq--read-project rhq-root-directory "project URL or directory")))
+  (let* ((cons (rhq--make-dirname-url-cons dirname-or-url rhq-root-directory rhq-default-protocol))
+         (absolute-path (car cons))
+         (url (cdr cons)))
+    (cond
+     ((file-exists-p absolute-path)
+      (find-file absolute-path))
+     ((null url)
+      (user-error "Cannot parse %s as URL" dirname-or-url))
+     (t
       (set-process-sentinel
-       (rhq-clone dirname-or-url)
+       (rhq-clone url)
        (lambda (process _)
-         (when (rhq--process-exit-normally-p process)
-           (let* ((dirname (rhq--dirname-or-url-exist dirname-or-url)))
-             (find-file (expand-file-name  dirname)))))))))
+         (if (rhq--process-exit-normally-p process)
+             (find-file absolute-path))))))))
 
 ;;;###autoload
 (defun rhq-find-file (filename)

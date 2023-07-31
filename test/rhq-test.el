@@ -39,5 +39,17 @@
 (ert-deftest rhq--check-executable-availability ()
   (rhq--check-executable-availability))
 
+(ert-deftest rhq--dirname-url-cons-with-protocol ()
+  (should (equal (rhq--make-dirname-url-cons "https://example.com/user/repo" "/home/user/rhq/" "protocol")
+                 (cons "/home/user/rhq/example.com/user/repo" "https://example.com/user/repo"))))
+
+(ert-deftest rhq--dirname-url-cons-absolute-path ()
+  (should (equal (rhq--make-dirname-url-cons "/path/to/repo" "/home/user/rhq/" "protocol")
+                 (cons "/path/to/repo" nil))))
+
+(ert-deftest rhq--dirname-url-cons-relative-path ()
+  (should (equal (rhq--make-dirname-url-cons "example.com/user/repo" "/home/user/rhq/" "protocol")
+                 (cons "/home/user/rhq/example.com/user/repo" "protocol://example.com/user/repo"))))
+
 (provide 'rhq-test)
 ;;; rhq-test.el ends here
